@@ -8,10 +8,13 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-   cookies: {
-  getAll: () => store.getAll(),
-  setAll: (list: { name: string; value: string; options?: any }[]) => {
-    try { list.forEach(({ name, value, options }) => store.set(name, value, options)); }
-    },
+      cookies: {
+        getAll: () => store.getAll(),
+        setAll: (list: { name: string; value: string; options?: any }[]) => {
+          try { list.forEach(({ name, value, options }) => store.set(name, value, options)); }
+          catch { /* called from a Server Component; middleware refreshes the session */ }
+        },
+      },
+    }
   );
 }
