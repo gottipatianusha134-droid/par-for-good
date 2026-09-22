@@ -1,7 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-/** Refreshes the Supabase session cookie and gates private areas. */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
@@ -10,10 +9,10 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
-        setAll: (list: { name: string; value: string; options?: any }[]) => {
-          list.forEach(({ name, value }) => request.cookies.set(name, value));
+        setAll: (list: any) => {
+          list.forEach((c: any) => request.cookies.set(c.name, c.value));
           response = NextResponse.next({ request });
-          list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+          list.forEach((c: any) => response.cookies.set(c.name, c.value, c.options));
         },
       },
     }
@@ -24,7 +23,7 @@ export async function middleware(request: NextRequest) {
   if (!user && isPrivate) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.search = `?next=${encodeURIComponent(path)}`;
+    url.search = "?next=" + encodeURIComponent(path);
     return NextResponse.redirect(url);
   }
   return response;
